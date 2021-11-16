@@ -19,17 +19,17 @@
 
 
 # Check if $datadir is set.
-[ -z "${datadir}" ] && error "\${datadir} is not defined"
+[[ -z ${datadir} ]] && error "\${datadir} is not defined"
 
 # Checks if $1 is a valid CSV ID.
 # Exit Code:
 #   0 - Valid
 #   1 - Invalid
 csv_is_ID() {
-   echo "$1" | grep -q '^[0-9]\{3\}$'
+   grep -q '^[0-9]\{3\}$' <<< "$1"
 }
 
-if [ "${enable_caching}" = true ]; then
+if [[ ${enable_caching} == 'true' ]]; then
 
    declare -A csv_cache
 
@@ -39,16 +39,16 @@ if [ "${enable_caching}" = true ]; then
    #   $2 - variable to store the data in
    csv_read() {
       local csv_data
-      if [ "${csv_cache[$1]}" ]; then
+      if [[ ${csv_cache[$1]} ]]; then
          debug "Cache Hit ($1)"
          csv_data="${csv_cache[$1]}"
       else
          debug "Cache Miss ($1)"
          decrypt "${datadir}/${1}.csv" csv_data
-         csv_cache[$1]="${csv_data}"
+         csv_cache["$1"]="${csv_data}"
       fi
 
-      [ ${#2} -ne 0 ] && eval "${2}='${csv_data}'" || echo "${csv_data}"
+      [[ ${#2} -ne 0 ]] && eval "${2}='${csv_data}'" || echo "${csv_data}"
    }
    
    # Write an encrypted CSV database.
@@ -57,10 +57,10 @@ if [ "${enable_caching}" = true ]; then
    #   $2 - new data
    csv_write() {
       local tmp_data
-      tmp_data="$(echo "$2" | sed '/^\s*$/d')"
+      tmp_data="$(sed '/^\s*$/d' <<< "$2")"
       mkdir -p "${datadir}" || error "failed to create ${datadir}"
-      echo "${tmp_data}" | encrypt "${datadir}/${1}.csv" || error "failed to update '$1'"
-      csv_cache[$1]="${tmp_data}"
+      encrypt "${datadir}/${1}.csv" <<< "${tmp_data}" || error "failed to update '$1'"
+      csv_cache["$1"]="${tmp_data}"
    }
 
 else
@@ -72,7 +72,7 @@ else
    csv_read() {
       local csv_data
       decrypt "${datadir}/${1}.csv" csv_data
-      [ ${#2} -ne 0 ] && eval "${2}='${csv_data}'" || echo "${csv_data}"
+      [[ ${#2} -ne 0 ]] && eval "${2}='${csv_data}'" || echo "${csv_data}"
    }
    
    # Write an encrypted CSV database.
@@ -81,7 +81,7 @@ else
    #   $2 - new data
    csv_write() {
       mkdir -p "${datadir}" || error "failed to create ${datadir}"
-      echo "$2" | encrypt "${datadir}/${1}.csv" || error "failed to update '$1'"
+      encrypt "${datadir}/${1}.csv" <<< "$2" || error "failed to update '$1'"
    }
 
 fi
@@ -111,15 +111,15 @@ csv_append() {
 csv_search() {
    local arg db csv_search_results
 
-   if [ -n "$3" ]; then
+   if [[ -n $3 ]]; then
       arg="$3"
    else
       arg="--"
    fi
 
    csv_read "$1" db
-   csv_search_results="$(echo "${db}" | grep "${arg}" "$2")"
-   [ ${#4} -ne 0 ] && eval "${4}='${csv_search_results}'" || echo "${csv_search_results}"
+   csv_search_results="$(grep "${arg}" "$2" <<< "${db}")"
+   [[ ${#4} -ne 0 ]] && eval "${4}='${csv_search_results}'" || echo "${csv_search_results}"
 }
 
 # Search for the next available ID.
@@ -130,13 +130,13 @@ csv_search() {
 csv_next_ID() {
    local csv
    csv_read "$1" csv
-   local ID="$(echo "${csv}" | cut -d',' -f1 | sort | tail -n1)"
-   if [ -z "${ID}" ]; then
+   local ID="$(cut -d',' -f1 <<< "${csv}" | sort | tail -n1)"
+   if [[ -z "${ID}" ]]; then
       ID="001"
    else
       ID="$(increment_ID "${ID}" 3)"
    fi
-   [ ${#2} -ne 0 ] && eval "${2}='${ID}'" || echo "${ID}"
+   [[ ${#2} -ne 0 ]] && eval "${2}='${ID}'" || echo "${ID}"
 }
 
 
@@ -147,6 +147,6 @@ csv_next_ID() {
 #   $3 - out
 csv_get() {
    local tmp
-   tmp="$(echo "$1" | cut -d',' -f"$2")"
-   [ "${#3}" -ne 0 ] && eval "${3}='${tmp}'" || echo "${tmp}"
+   tmp="$(cut -d',' -f"$2" <<< "$1")"
+   [[ ${#3} -ne 0 ]] && eval "${3}='${tmp}'" || echo "${tmp}"
 }
