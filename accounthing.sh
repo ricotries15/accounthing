@@ -61,7 +61,7 @@ prog="$(basename "$0")"
 . "${libdir}/version.bash"
 
 
-[ $# -lt 1 ] && echo "Usage: ${prog} -h" >&2 && exit 1
+[[ $# -lt 1 ]] && echo "Usage: ${prog} -h" >&2 && exit 1
 
 check_version
 
@@ -88,12 +88,12 @@ case "$1" in
    exit
    ;;
 -sc)
-   [ -z "$2" ] && echo "Usage: ${prog} $1 name/ID" >&2 && exit 1
+   [[ -z $2 ]] && echo "Usage: ${prog} $1 name/ID" >&2 && exit 1
    cdb_print "$2"
    ret="$?"
    ;;
 -st)
-   [ -z "$2" ] && echo "Usage: ${prog} $1 name/ID" >&2 && exit 1
+   [[ -z $2 ]] && echo "Usage: ${prog} $1 name/ID" >&2 && exit 1
    tdb_print "$2"
    ret="$?"
    ;;
@@ -102,7 +102,7 @@ case "$1" in
    ret="$?"
    ;;
 -lt)
-   if [ -z "$2" ]; then
+   if [[ -z $2 ]]; then
       tdb_list
       ret="$?"
    else
@@ -128,7 +128,7 @@ case "$1" in
    ret="$?"
    ;;
 -atc)
-   if [ "$5" ] && [ ! "$6" ]; then
+   if [[ $5 && -z $6 ]]; then
       tdb_add_direct "$2" "$3" "$4" "" "$5"
    else
       tdb_add_direct "$2" "$3" "$4" "$5" "$6"
@@ -136,22 +136,22 @@ case "$1" in
    ret="$?"
    ;;
 -rc)
-   [ -z "$2" ] && echo "Usage: ${prog} $1 name/ID" >&2 && exit 1
+   [[ -z $2 ]] && echo "Usage: ${prog} $1 name/ID" >&2 && exit 1
    cdb_remove_i "$2"
    ret="$?"
    ;;
 -rt)
-   [ -z "$2" ] && echo "Usage: ${prog} $1 ID" >&2 && exit 1
+   [[ -z $2 ]] && echo "Usage: ${prog} $1 ID" >&2 && exit 1
    tdb_remove_i "$2"
    ret="$?"
    ;;
 -i)
-   ([ -z "$2" ] || [ -z "$3" ]) && echo "Usage: ${prog} $1 customer month" >&2 && exit 1
+   [[ -z $2 || -z $3 ]] && echo "Usage: ${prog} $1 customer month" >&2 && exit 1
    generate_invoice "$2" "$3"
    ret="$?"
    ;;
 -ia)
-   if [ -z "$2" ]; then
+   if [[ -z $2 ]]; then
       generate_all_invoices "$(date +"%Y-%m")"
       ret="$?"
    else
