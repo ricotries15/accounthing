@@ -63,35 +63,38 @@ check_dep "dialog" 1
 [ -z "${conffile}" ]    && conffile="${prefix}/etc/${prog_name}.conf"
 
 # Install all necessary directories.
-install -vdm755               \
+install -vdm755              \
    "${DESTDIR}${bindir}"     \
    "${DESTDIR}${libdir}"     \
    "${DESTDIR}${invoicedir}" \
-   "${DESTDIR}${datadir}"    || exit 1
+   "${DESTDIR}${datadir}"    \
+   || exit 1
 
 # Install the program.
-install -vDm755 "${prog_name}.sh" \
-   "${DESTDIR}${bindir}/${prog_name}" || exit 1
+install -vDm755 "${prog_name}.sh"     \
+   "${DESTDIR}${bindir}/${prog_name}" \
+   || exit 1
 
 # Patch the paths of the program.
 echo "Patching ${prog_name}..." >&2
-sed -i                                                      \
-   -e "s,prefix=.*,prefix=${prefix},"                       \
-   -e "s,libdir=.*,libdir=${libdir},"                       \
-   -e "s,invoicedir=.*,invoicedir=${invoicedir},"           \
-   -e "s,datadir=.*,datadir=${datadir},"                    \
-   -e "s,conffile=.*,conffile=${conffile},"                 \
-   "${DESTDIR}${bindir}/${prog_name}"                      || exit 1
-
+sed -i                                            \
+   -e "s,prefix=.*,prefix=${prefix},"             \
+   -e "s,libdir=.*,libdir=${libdir},"             \
+   -e "s,invoicedir=.*,invoicedir=${invoicedir}," \
+   -e "s,datadir=.*,datadir=${datadir},"          \
+   -e "s,conffile=.*,conffile=${conffile},"       \
+   "${DESTDIR}${bindir}/${prog_name}"             \
+   || exit 1
 
 install -vDm644 ./lib/* "${DESTDIR}${libdir}" || exit 1
 
 # Install the template invoice.
-install -vDm644               \
-   "invoice/template.tex"     \
-   "invoice/invoice.cls"      \
-   "invoice/Logo.png"         \
-   "${DESTDIR}${invoicedir}" || exit 1
+install -vDm644              \
+   "invoice/template.tex"    \
+   "invoice/invoice.cls"     \
+   "invoice/Logo.png"        \
+   "${DESTDIR}${invoicedir}" \
+   || exit 1
 
 # Install the config file.
 install -vDm644 "config.sh" "${DESTDIR}${conffile}" || exit 1
