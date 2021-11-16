@@ -87,7 +87,7 @@ cdb_print() {
 # Returns:
 #   String to be printed to standard output.
 cdb_do_print() {
-   [ -z "$1" ] && return 1
+   [[ -z $1 ]] && return 1
    printf '\033[33m============== %s\033[0m\n' "$(csv_get "$1" $CUSTOMER_NAME)"
    printf "| ID:          %s\n" "$(csv_get "$1" $CUSTOMER_ID)"
    printf "| Address:     %s\n" "$(csv_get "$1" $CUSTOMER_ADDRESS)"
@@ -100,10 +100,10 @@ cdb_do_print() {
 cdb_list() {
    local line cdb IFS
    csv_read "customers" cdb
-   cdb="$(echo "${cdb}" | tr '\n' '=')"
+   cdb="$(tr '\n' '=' <<< "${cdb}")"
    IFS='='
    for line in ${cdb}; do
-      [ -n "${line}" ] && cdb_do_print "${line}"
+      [[ ${line} ]] && cdb_do_print "${line}"
    done
 }
 
@@ -133,8 +133,8 @@ cdb_calc_total() {
    local entry cost
    cdb_search "$1" "" entry
    csv_get "${entry}" $CUSTOMER_HOURLY cost
-   [ -z "${cost}" ] && return 1
-   echo "scale=2; ${cost} * $2" | bc
+   [[ -z ${cost} ]] && return 1
+   bc <<< "scale=2; ${cost} * $2"
 }
 
 # Interactively add a new customer to the database.
@@ -160,7 +160,7 @@ cdb_add_i() {
    name="$(prompt "Name" "$(csv_get "${old}" $CUSTOMER_NAME)")"
 
    # If no old entry is found yet, find any entry with the same name.
-   [ -z "${old}" ] && cdb_search_by_name "${name}" "" old
+   [[ -z ${old} ]] && cdb_search_by_name "${name}" "" old
 
    # Read the address for the new customer.
    address="$(prompt "Address" "$(csv_get "${old}" $CUSTOMER_ADDRESS)")"
@@ -203,10 +203,10 @@ cdb_remove_i() {
    csv_get "${entry}" $CUSTOMER_ID CID
    csv_get "${entry}" $CUSTOMER_NAME name
 
-   if [ -n "${name}" ]; then
+   if [[ ${name} ]]; then
       printf 'Are your sure to remove '%s' (%s)? ' "${name}" "${CID}" >&2
       read -r resp
-      [ "${resp}" = "y" ] || return
+      [[ ${resp} == "y" ]] || return
       cdb_remove "${CID}"
       git_append_msg "Removed customer '${name}' (${CID})"
    else
