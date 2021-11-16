@@ -22,26 +22,26 @@
 # git_commit_msg is now defined in the config
 git_need_commit=0
 
-if [ "${enable_git}" = true ]; then
+if [[ ${enable_git} == 'true' ]]; then
 
-   if [ -z "${GIT}" ]; then
+   if [[ -z ${GIT} ]]; then
       GIT="$(which git)"
-      [ -z "${GIT}" ] && error "git is not installed."
+      [[ -z ${GIT} ]] && error "git is not installed."
    fi
 
    # Commits to the git repo.
    git_commit() {
-      [ "${git_need_commit}" = 0 ] && return
+      [[ ${git_need_commit} -eq 0 ]] && return
 
       pushd "${datadir}" >/dev/null
 
       # If there is no git repo
-      if [ ! -d .git ]; then
+      if [[ ! -d .git ]]; then
          "${GIT}" init -q || return 1
       fi
 
       "${GIT}" add . || return 1
-      echo "${git_commit_msg}" | "${GIT}" commit -qF - || return 1
+      "${GIT}" commit -qF - <<< "${git_commit_msg}" || return 1
       popd >/dev/null
    }
 
