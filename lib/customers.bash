@@ -15,7 +15,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Customer Database module
+### Customer Database module
 
 # Format:
 # - Customer ID   (eg. 001)
@@ -144,7 +144,6 @@ cdb_calc_total() {
 cdb_add_i() {
    local CID name address zip cost old
    echo "Adding a new customer." >&2
-
 
    # Read the ID for the new customer.
    while true; do
