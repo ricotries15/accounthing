@@ -15,8 +15,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# Read/Write encrypted CSV databases
-
+### Read/Write encrypted CSV databases
 
 # Check if $datadir is set.
 [[ -z ${datadir} ]] && error "\${datadir} is not defined"
@@ -111,11 +110,8 @@ csv_append() {
 csv_search() {
    local arg db csv_search_results
 
-   if [[ -n $3 ]]; then
-      arg="$3"
-   else
-      arg="--"
-   fi
+   arg="--"
+   [[ $3 ]] && arg="$3"
 
    csv_read "$1" db
    csv_search_results="$(grep "${arg}" "$2" <<< "${db}")"
@@ -131,14 +127,9 @@ csv_next_ID() {
    local csv
    csv_read "$1" csv
    local ID="$(cut -d',' -f1 <<< "${csv}" | sort | tail -n1)"
-   if [[ -z "${ID}" ]]; then
-      ID="001"
-   else
-      ID="$(increment_ID "${ID}" 3)"
-   fi
+   [[ -z ${ID} ]] && ID="001" || ID="$(increment_ID "${ID}" 3)"
    [[ ${#2} -ne 0 ]] && eval "${2}='${ID}'" || echo "${ID}"
 }
-
 
 # Get an entry from a CSV-line
 # Arguments:
