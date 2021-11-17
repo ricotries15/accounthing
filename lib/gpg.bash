@@ -19,14 +19,14 @@
 # External Dependencies:
 # - gpg
 
-if [ "${enable_gpg}" = true ]; then
+if [[ ${enable_gpg} == 'true' ]]; then
    
    # Sometimes gpg-agent is broken.
    export GPG_TTY="$(tty)"
 
-   if [ -z "${GPG}" ]; then
+   if [[ -z ${GPG} ]]; then
       GPG="$(which gpg || which gpg2)"
-      [ -z "${GPG}" ] && error "GNU Privacy Guard (gpg) is not installed."
+      [[ -z ${GPG} ]] && error "GNU Privacy Guard (gpg) is not installed."
    fi
    
    # Encrypt standard input.
@@ -47,7 +47,7 @@ if [ "${enable_gpg}" = true ]; then
    decrypt() {
       local gpg_data
 
-      [ ${#2} -eq 0 ] && error "\$2 is undefined"
+      [[ ${#2} -eq 0 ]] && error "\$2 is undefined"
 
       gpg_data="$("${GPG}" -d "${1}.gpg" 2>/dev/null)"
 
@@ -60,7 +60,7 @@ else
    }
 
    decrypt() {
-      [ ${#2} -eq 0 ] && error "\$2 is undefined"
+      [[ ${#2} -eq 0 ]] && error "\$2 is undefined"
       eval "${2}='$(cat "$1")'"
    }
 fi
